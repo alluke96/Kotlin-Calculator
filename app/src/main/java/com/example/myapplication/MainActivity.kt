@@ -11,6 +11,8 @@ class MainActivity : AppCompatActivity() {
     private var operand1: Double = 0.0
     private var operator: String? = null
     private var clearInput: Boolean = false
+    private var clearResult: Boolean = false
+    private var lastPressedWasOperator: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,8 +21,7 @@ class MainActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         // Definir os listeners para os botões numéricos
         binding.button0.setOnClickListener { numberPressed("0") }
@@ -51,12 +52,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun numberPressed(number: String) {
+        // verifica se o resultado deve ser limpo
+        if(clearResult) {
+            binding.textViewResult.text = ""
+            clearResult = false
+        }
+
         var currentInput = binding.textViewResult.text.toString()
         if(operator != null && clearInput) {
             currentInput = ""
         }
         binding.textViewResult.text = currentInput + number
         clearInput = false
+        lastPressedWasOperator = false
+
     }
 
     private fun dotPressed() {
@@ -64,11 +73,12 @@ class MainActivity : AppCompatActivity() {
         if (!currentInput.contains(".")) {
             binding.textViewResult.text = currentInput + "."
         }
+        lastPressedWasOperator = false
     }
 
     private fun operatorPressed(operator: String) {
         // Verifica se já houve uma operação antes
-        if(binding.textViewInput.text.isNotEmpty()) {
+        if(binding.textViewInput.text.isNotEmpty() && !lastPressedWasOperator) {
             calculateResult()
         }
 
@@ -76,8 +86,9 @@ class MainActivity : AppCompatActivity() {
         operand1 = binding.textViewResult.text.toString().toDouble()
         this.operator = operator
         clearInput = true
+        if(!lastPressedWasOperator) binding.textViewInput.text = currentInput + operator
 
-        binding.textViewInput.text = currentInput + operator
+        lastPressedWasOperator = true
     }
 
     private fun calculateResult() {
@@ -99,6 +110,8 @@ class MainActivity : AppCompatActivity() {
         operand1 = 0.0
         operator = null
         clearInput = true
+        clearResult = true
+        lastPressedWasOperator = false
     }
 
     private fun clearCalculator() {
@@ -107,5 +120,7 @@ class MainActivity : AppCompatActivity() {
         operand1 = 0.0
         operator = null
         clearInput = false
+        clearResult = false
+        lastPressedWasOperator = false
     }
 }
