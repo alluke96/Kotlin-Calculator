@@ -70,7 +70,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun dotPressed() {
         val currentInput = binding.textViewResult.text.toString()
-        if (!currentInput.contains(".")) {
+        if(currentInput.isEmpty()) {
+            binding.textViewResult.text = "0."
+        } else if (!currentInput.contains(".")) {
             binding.textViewResult.text = currentInput + "."
         }
         lastPressedWasOperator = false
@@ -82,16 +84,25 @@ class MainActivity : AppCompatActivity() {
             calculateResult()
         }
 
+        // verifica se há números preenchidos
+        if(binding.textViewResult.text.isEmpty()) return
+
         val currentInput = binding.textViewResult.text.toString()
         operand1 = binding.textViewResult.text.toString().toDouble()
+
         this.operator = operator
         clearInput = true
-        if(!lastPressedWasOperator) binding.textViewInput.text = currentInput + operator
-
         lastPressedWasOperator = true
+
+        binding.textViewInput.text = currentInput + operator
     }
 
     private fun calculateResult() {
+        // verifica se há números preenchidos
+        if(binding.textViewInput.text.isEmpty() ||
+           binding.textViewResult.text.isEmpty() )
+            return
+
         val operand2 = binding.textViewResult.text.toString().toDouble()
         var result: Double? = null
 
